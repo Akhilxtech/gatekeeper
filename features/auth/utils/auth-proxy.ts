@@ -26,7 +26,7 @@ function redirectToSignIn(request: NextRequest, pathname: string) {
   export async function handleAuthProxy(request: NextRequest){
     const {pathname}= request.nextUrl;
 
-    if(pathname==="/"){
+    if(pathname==="/"){ // homepage req hai kuch mat kro agge jane do aur code yhi roko
         return NextResponse.next();
     }
     const session= await auth.api.getSession({
