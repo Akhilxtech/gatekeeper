@@ -9,6 +9,6 @@ export default async function Proxy(request:NextRequest){
 
 // konsa path run karega auth middleware ko isko limit kar rhe hai yha per
 export const config={ // inhi path per proxy available honi chiye
-    matcher:["/sign-in","/dashboard","/dashboard/:path"]
+    matcher:["/sign-in","/dashboard","/dashboard/:path*"]
 }
 
