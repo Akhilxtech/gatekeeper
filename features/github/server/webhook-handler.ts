@@ -1,4 +1,4 @@
-import { savePullRequest } from "@/features/reviews/save-pull-requests";
+import { savePullRequest } from "@/features/reviews/server/save-pull-requests";
 import { getGithubApp } from "../utils/github-app";
 
 

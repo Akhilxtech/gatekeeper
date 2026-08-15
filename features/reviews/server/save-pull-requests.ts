@@ -1,5 +1,6 @@
 import {prisma} from "@/lib/db"
-import { PullRequestWebhookPayload } from "../github/server/webhook-handler";
+import { PullRequestWebhookPayload } from "../../github/server/webhook-handler";
+
 
 
  function getAuthorLogin(
