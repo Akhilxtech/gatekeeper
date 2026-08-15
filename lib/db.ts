@@ -1,6 +1,5 @@
 import {PrismaPg} from "@prisma/adapter-pg"
 import { PrismaClient } from "./generated/prisma/client";
-
 const globalForPrisma = globalThis as unknown as{
     prisma: PrismaClient | undefined
 }
@@ -9,7 +8,11 @@ function createPrismaClient(){
     const url= process.env.DATABASE_URL;
     if(!url) throw new Error("DATABASE_URL is not set");
 
-    const adapter= new PrismaPg({connectionString:url});
+    const adapter = new PrismaPg({
+        connectionString: url,
+        max: 10,
+        connectionTimeoutMillis: 10000, // 10 second timeout, default kam ho sakta hai
+      });
     return new PrismaClient({adapter})
 }
 
