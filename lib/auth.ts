@@ -11,6 +11,12 @@ export const auth = betterAuth({
     github: { 
       clientId: process.env.GITHUB_CLIENT_ID as string, 
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string, 
+      mapProfileToUser: async (profile)=> {
+        return {
+          email:profile.email ?? `${profile.id}@users.noreply.github.com`,
+          name: profile.name ?? profile.login
+        }
+      },
     }, 
   }, 
   plugins: [nextCookies()] // make sure this is the last plugin in the array
