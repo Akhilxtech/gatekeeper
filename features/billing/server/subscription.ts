@@ -35,7 +35,7 @@ export async function getUserSubscription(
       user.subscriptionRenewsAt !== null && user.subscriptionRenewsAt > new Date();
 
     if (stillActive) {
-      return { plan: "pro", status: "active", renewsAt };
+      return { plan: "pro", status: "canceled", renewsAt };
     }
 
     return { plan: "free", status: "canceled", renewsAt };
