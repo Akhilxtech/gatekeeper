@@ -1,9 +1,10 @@
-import {generateText} from 'ai'
-import {openrouter} from "@/features/ai"
 
-const REVIEW_MODEL= "openrouter/free"
+import { generateText } from 'ai'
+import { openrouter } from "@/features/ai"
 
-const SYSTEM_PROMPT=`You are an expert code reviewer with deep knowledge of software engineering best practices, security, and performance optimization.
+const REVIEW_MODEL = "openrouter/free"
+
+const SYSTEM_PROMPT = `You are an expert code reviewer with deep knowledge of software engineering best practices, security, and performance optimization.
 
 Review the provided unified diff chunks and write a concise, actionable pull request review in markdown.
 
@@ -17,7 +18,6 @@ Analyze the changes across these dimensions (only mention what's relevant):
 - **Reliability** — Unhandled errors/edge cases, missing null checks, race conditions
 - **Readability** — Naming clarity, overly complex logic, missing comments on non-obvious code
 - **Maintainability** — Tight coupling, duplication, violations of SOLID/DRY principles
-
 
 ## Output Format
 
@@ -43,36 +43,52 @@ Then use this structure if there are findings:
 - Tailor feedback to the repository language and conventions visible in the diff`;
 
 type ReviewInput = {
-    repoFullName: string;
-    title: string;
-    /** Chunks retrieved from the PR's Pinecone namespace */
-    contextSnippets: string[];
-    /** Optional chunks from repo-sync namespace (full codebase context) */
-    repoContextSnippets: string[];
+  repoFullName: string;
+  title: string;
+  /** Unified diff chunks for the changed files in this PR */
+  diff: string;
+  /** Chunks retrieved from the PR's Pinecone namespace */
+  contextSnippets: string[];
+  /** Optional chunks from repo-sync namespace (full codebase context) */
+  repoContextSnippets: string[];
 };
 
 function buildRepoContextSection(repoContextSnippets: string[]) {
-    if (repoContextSnippets.length === 0) {
-        return "";
-    }
+  if (repoContextSnippets.length === 0) {
+    return "";
+  }
 
-    const repoContext = repoContextSnippets.join("\n\n---\n\n");
+  const repoContext = repoContextSnippets.join("\n\n---\n\n");
 
-    return `
-  
-  Related code from the repository (for context only, not part of the change):
-  
-  ${repoContext}`;
+  return `
+Related code from the repository (for context only, not part of the change):
+${repoContext}`;
 }
 
+function buildPrContextSection(contextSnippets: string[]) {
+  if (contextSnippets.length === 0) {
+    return "";
+  }
 
+  const prContext = contextSnippets.join("\n\n---\n\n");
 
-export async function generateReview(input: ReviewInput){
-    const {text}= await generateText({
-        model: openrouter(REVIEW_MODEL),
-        system: SYSTEM_PROMPT,
-        prompt: `Repository: ${input.repoFullName} Pull request title: ${input.title}`
-    })
+  return `
+Other related changes within this PR:
+${prContext}`;
+}
 
-    return text;
+export async function generateReview(input: ReviewInput) {
+  const { text } = await generateText({
+    model: openrouter(REVIEW_MODEL),
+    system: SYSTEM_PROMPT,
+    prompt: `Repository: ${input.repoFullName}
+Pull request title: ${input.title}
+
+## Diff
+${input.diff}
+${buildPrContextSection(input.contextSnippets)}
+${buildRepoContextSection(input.repoContextSnippets)}`,
+  });
+
+  return text;
 }
