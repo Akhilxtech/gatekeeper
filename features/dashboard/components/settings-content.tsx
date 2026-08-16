@@ -225,11 +225,9 @@ function SubscriptionTab({
         </ul>
       </CardContent>
       <CardFooter className="flex flex-wrap gap-2">
-        {subscription.plan === "free" ? <UpgradeButton /> : null}
-        {subscription.plan === "pro" ? (
-          <CancelSubscriptionButton
-            disabled={subscription.status === "canceled"}
-          />
+        {subscription.plan === "free" || subscription.status === "canceled" ? <UpgradeButton /> : null}
+        {subscription.plan === "pro" && subscription.status !== "canceled" ? (
+          <CancelSubscriptionButton />
         ) : null}
       </CardFooter>
     </Card>
