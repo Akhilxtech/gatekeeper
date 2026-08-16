@@ -61,7 +61,6 @@ export function buildRepoNamespace(repoFullName: string) {
     return `repo--${filePath}--part-${part}`;
   }
    
-
   export function chunkRepoFiles(files: RepoFile[]): CodeChunk[] {
     const chunks: CodeChunk[] = [];
   
@@ -71,6 +70,11 @@ export function buildRepoNamespace(repoFullName: string) {
       for (let start = 0; start < lines.length; start += MAX_CHUNK_LINES) {
         const part = start / MAX_CHUNK_LINES;
         const text = lines.slice(start, start + MAX_CHUNK_LINES).join("\n");
+  
+        // Skip empty or whitespace-only chunks — Pinecone's embedding model rejects them
+        if (text.trim().length === 0) {
+          continue;
+        }
   
         chunks.push({
           id: buildChunkId(file.filePath, part),
@@ -123,8 +127,10 @@ export function buildRepoNamespace(repoFullName: string) {
   export async function saveRepoChunks(namespace: string, chunks: CodeChunk[]) {
     const index = getPineconeIndex();
   
-    for (let start = 0; start < chunks.length; start += UPSERT_BATCH_SIZE) {
-      const batch = chunks.slice(start, start + UPSERT_BATCH_SIZE);
+    const validChunks = chunks.filter((chunk) => chunk.text.trim().length > 0);
+  
+    for (let start = 0; start < validChunks.length; start += UPSERT_BATCH_SIZE) {
+      const batch = validChunks.slice(start, start + UPSERT_BATCH_SIZE);
   
       const records = batch.map((chunk) => ({
         id: chunk.id,
