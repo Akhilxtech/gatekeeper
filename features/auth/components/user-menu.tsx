@@ -17,7 +17,7 @@ import {
 import { CaretCircleUpIcon, SignOutIcon } from "@phosphor-icons/react";
 import { SIGN_IN_PATH } from "../utils";
 
-const DEFAULT_PLAN= "Free"
+const DEFAULT_PLAN= "free"
 
 export type UserMenuUser={
     name?: string | null;
@@ -135,7 +135,7 @@ export function getDisplayName(user: UserMenuUser) {
                       {user.email}
                     </p>
                   ) : null}
-                  <Badge variant="secondary" className="w-fit">
+                  <Badge variant="secondary" className="w-fit capitalize">
                     {plan} plan
                   </Badge>
                 </div>

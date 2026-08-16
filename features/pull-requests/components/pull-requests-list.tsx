@@ -144,7 +144,7 @@ function PullRequestRow({
       <div className="flex flex-wrap items-center gap-2">
         <GitPullRequestIcon className="size-4 shrink-0 text-muted-foreground" />
         <Link
-          href={`/dashboard/pull-requests/${pullRequest.id}`}
+          href={`/dashboard/pull-request/${pullRequest.id}`}
           className="font-medium hover:underline"
         >
           {pullRequest.title}

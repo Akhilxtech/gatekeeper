@@ -32,8 +32,8 @@ export function getGithubApp(){
 
 
 export function getGithubInstallUrl(userId: string){
-    const appName= process.env.GITHUB_APP_NAME!;
-    const url= new URL(`https://github.com/apps/${appName}/installations/new`);
+
+    const url= new URL(`https://github.com/apps/gatekeper-project/installations/new`);
     url.searchParams.set("state",userId);
     return url.toString();
 }

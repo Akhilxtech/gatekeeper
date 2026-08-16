@@ -11,7 +11,10 @@ export const auth = betterAuth({
     github: { 
       clientId: process.env.GITHUB_CLIENT_ID as string, 
       clientSecret: process.env.GITHUB_CLIENT_SECRET as string, 
+      scope: ["user:email"],
       mapProfileToUser: async (profile)=> {
+        console.log("profile",profile);
+        
         return {
           email:profile.email ?? `${profile.id}@users.noreply.github.com`,
           name: profile.name ?? profile.login
