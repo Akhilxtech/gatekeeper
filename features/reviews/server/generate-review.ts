@@ -42,11 +42,14 @@ Then use this structure if there are findings:
 - If the diff looks clean with no concerns, say so clearly in 1–2 sentences — do not invent problems
 - Tailor feedback to the repository language and conventions visible in the diff`;
 
-
-type ReviewInput={
+type ReviewInput = {
     repoFullName: string;
     title: string;
-}
+    /** Chunks retrieved from the PR's Pinecone namespace */
+    contextSnippets: string[];
+    /** Optional chunks from repo-sync namespace (full codebase context) */
+    repoContextSnippets: string[];
+};
 
 function buildRepoContextSection(repoContextSnippets: string[]) {
     if (repoContextSnippets.length === 0) {
