@@ -36,7 +36,7 @@ export function DashboardSidebar({ user, plan = "free" }: DashboardSidebarProps)
                 <Link href={DASHBOARD_ROUTES.overview}>
                   <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-none bg-sidebar">
                     <Image
-                      src="/gatekeeper-logo.svg"
+                      src="/gatekeeper.png"
                       alt=""
                       width={62}
                       height={62}

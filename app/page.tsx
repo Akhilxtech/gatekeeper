@@ -415,7 +415,7 @@ export default function LandingPage() {
           <div className="flex flex-col items-center gap-3 md:items-start">
             <div className="flex items-center gap-2">
               <Image
-                src="/gatekeeper-logo.svg"
+                src="/gatekeeper.png"
                 alt="GateKeeper"
                 width={24}
                 height={24}

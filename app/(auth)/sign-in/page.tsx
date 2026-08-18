@@ -33,7 +33,7 @@ const signInPage = async ({searchParams}:signInPageProps) => {
          <CardHeader className="items-center text-center">
            <div className="mb-6 flex justify-center pt-2">
              <Image
-               src="/gatekeeper-logo.svg"
+               src="/gatekeeper.png"
                alt="Chai AI Code Reviewer"
                width={172}
                height={172}
