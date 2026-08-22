@@ -51,7 +51,12 @@ export async function getUserSubscription(
 export async function createProSubscription(userId: string) {
   const subscription = await getUserSubscription(userId);
 
-  if (subscription.plan === "pro" && subscription.status === "active") {
+  // Only block if the user already has a fully active Pro subscription.
+  // Allow re-subscribing for canceled or expired plans.
+  if (
+    subscription.plan === "pro" &&
+    subscription.status === "active"
+  ) {
     throw new Error("You already have an active Pro subscription.");
   }
 

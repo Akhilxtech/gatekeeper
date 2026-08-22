@@ -21,6 +21,37 @@ declare global {
 
 const RAZORPAY_SCRIPT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 
+/** Maximum number of times to poll for subscription activation. */
+const MAX_POLL_ATTEMPTS = 20;
+/** Interval between polls in milliseconds. */
+const POLL_INTERVAL_MS = 1500;
+
+/**
+ * Polls the subscription status API until the plan becomes active
+ * or the maximum number of attempts is reached.
+ *
+ * @returns `true` if the subscription was confirmed as active, `false` otherwise.
+ */
+async function waitForSubscriptionActivation(): Promise<boolean> {
+    for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
+        try {
+            const res = await fetch("/api/billing/subscription-status");
+            if (res.ok) {
+                const data = await res.json();
+                if (data.plan === "pro" && data.status === "active") {
+                    return true;
+                }
+            }
+        } catch {
+            // Network error — continue polling
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+    }
+
+    return false;
+}
+
 export function UpgradeButton() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
@@ -48,8 +79,19 @@ export function UpgradeButton() {
             subscription_id: subscriptionId,
             name: "Gatekeeper",
             description: "Pro plan — unlimited AI reviews",
-            handler: () => {
-              toast.success("Payment successful! Your Pro plan will activate shortly.");
+            handler: async () => {
+              toast.success("Payment successful! Activating your Pro plan…");
+
+              const activated = await waitForSubscriptionActivation();
+
+              if (activated) {
+                toast.success("🎉 Pro plan is now active!");
+              } else {
+                toast.info(
+                  "Payment received! Your Pro plan will activate shortly — please refresh in a moment."
+                );
+              }
+
               router.refresh();
             },
           });
