@@ -45,7 +45,7 @@ function toUserSubscription(
       user.subscriptionRenewsAt > new Date();
 
     if (stillActive) {
-      return { plan: "pro", status: "active", renewsAt };
+      return { plan: "pro", status: "canceled", renewsAt };
     }
 
     return { plan: "free", status: "canceled", renewsAt };
@@ -60,6 +60,26 @@ function toUserSubscription(
   }
 
   return { plan: "free", status: "canceled", renewsAt };
+}
+
+/**
+ * A canceled subscription remains usable through its already-paid renewal
+ * date, even though the UI should immediately offer a new upgrade.
+ */
+export function hasProAccess(subscription: UserSubscription): boolean {
+  if (subscription.plan !== "pro") {
+    return false;
+  }
+
+  if (subscription.status === "active") {
+    return true;
+  }
+
+  return (
+    subscription.status === "canceled" &&
+    subscription.renewsAt !== null &&
+    new Date(subscription.renewsAt) > new Date()
+  );
 }
 
 function getRazorpaySubscriptionUpdate(
