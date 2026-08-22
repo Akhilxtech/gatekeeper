@@ -21,41 +21,9 @@ declare global {
 
 const RAZORPAY_SCRIPT_URL = "https://checkout.razorpay.com/v1/checkout.js";
 
-/** Maximum number of times to poll for webhook to update the DB. */
-const MAX_POLL_ATTEMPTS = 15;
-/** Interval between polls in milliseconds. */
-const POLL_INTERVAL_MS = 2000;
-
-/**
- * Polls the subscription status API until the webhook has updated the
- * plan to "pro" in the DB, or we hit the max attempts.
- *
- * @returns `true` if the subscription was confirmed as active.
- */
-async function waitForWebhookActivation(): Promise<boolean> {
-    for (let attempt = 0; attempt < MAX_POLL_ATTEMPTS; attempt++) {
-        try {
-            const res = await fetch("/api/billing/subscription-status");
-            if (res.ok) {
-                const data = await res.json();
-                if (data.plan === "pro" && data.status === "active") {
-                    return true;
-                }
-            }
-        } catch {
-            // Network error — continue polling
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
-    }
-
-    return false;
-}
-
 export function UpgradeButton() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
-    const [activating, setActivating] = useState(false);
 
 
     async function handleUpgrade() {
@@ -78,25 +46,10 @@ export function UpgradeButton() {
           const checkout = new window.Razorpay({
             key,
             subscription_id: subscriptionId,
-            name: "Gatekeeper",
+            name: "Chai Code Reviewer",
             description: "Pro plan — unlimited AI reviews",
-            handler: async () => {
-              // Payment succeeded — now wait for the Razorpay webhook
-              // to update the DB with plan: "pro"
-              setActivating(true);
-              toast.success("Payment successful! Activating your Pro plan…");
-
-              const activated = await waitForWebhookActivation();
-
-              if (activated) {
-                toast.success("🎉 Pro plan is now active!");
-              } else {
-                toast.info(
-                  "Payment received! Your Pro plan will activate shortly — please refresh the page in a moment."
-                );
-              }
-
-              setActivating(false);
+            handler: () => {
+              toast.success("Payment successful! Your Pro plan will activate shortly.");
               router.refresh();
             },
           });
@@ -110,22 +63,15 @@ export function UpgradeButton() {
           setLoading(false);
         }
       }
-
-    const buttonText = activating
-        ? "Activating Pro…"
-        : loading
-            ? "Opening checkout…"
-            : "Upgrade to Pro";
-
     return (
         <>
             <Script src={RAZORPAY_SCRIPT_URL} strategy="lazyOnload"></Script>
             <Button
                 onClick={handleUpgrade}
-                disabled={loading || activating}
+                disabled={loading}
                 className={cn(statusButtonClass.success)}
             >
-                {buttonText}
+                {loading ? "Opening checkout…" : "Upgrade to Pro"}
             </Button>
         </>
     )

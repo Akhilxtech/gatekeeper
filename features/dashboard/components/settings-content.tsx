@@ -167,23 +167,6 @@ function SubscriptionTab({
 
   const isActive = subscription.status === "active" || subscription.status === "trialing";
 
-  // Canceled but still within the paid period — user retains Pro access
-  const isCanceledButStillPro =
-    subscription.plan === "pro" && subscription.status === "canceled";
-
-  // Canceled and the paid period has expired — reverted to Free
-  const isCanceledAndExpired =
-    subscription.plan === "free" && subscription.status === "canceled";
-
-  // Show upgrade button when on Free plan, or when canceled (either still active or expired)
-  const showUpgradeButton =
-    subscription.plan === "free" ||
-    subscription.status === "canceled";
-
-  // Show cancel button only when actively subscribed to Pro (not already canceled)
-  const showCancelButton =
-    subscription.plan === "pro" && subscription.status === "active";
-
   // Visual styling reflects active vs inactive subscription
   let cardBorderClass = "border-border";
   let planTextClass = "text-foreground";
@@ -215,9 +198,7 @@ function SubscriptionTab({
             "flex flex-wrap items-center justify-between gap-4 rounded-none border p-4",
             isActive
               ? "border-green-500/30 bg-green-500/5"
-              : isCanceledButStillPro
-                ? "border-amber-500/30 bg-amber-500/5"
-                : "border-border bg-muted/30"
+              : "border-border bg-muted/30"
           )}
         >
           <div>
@@ -228,11 +209,7 @@ function SubscriptionTab({
               Status:{" "}
               <span className={statusTextClass}>{statusLabel}</span>
             </p>
-            {isCanceledButStillPro && renewalDate ? (
-              <p className="text-xs text-amber-600 dark:text-amber-400">
-                Pro access continues until {renewalDate}, then reverts to Free.
-              </p>
-            ) : renewalDate ? (
+            {renewalDate ? (
               <p className="text-xs text-muted-foreground">
                 Renews {renewalDate}
               </p>
@@ -240,34 +217,6 @@ function SubscriptionTab({
           </div>
           <span className={statusBadge(badgeTone)}>{planDetails.label}</span>
         </div>
-
-        {/* Cancellation notices */}
-        {isCanceledButStillPro ? (
-          <div className="rounded-none border border-amber-500/30 bg-amber-500/5 p-3">
-            <p className="text-sm font-medium text-amber-700 dark:text-amber-300">
-              Your subscription has been canceled
-            </p>
-            <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
-              You still have Pro access until{" "}
-              {renewalDate ?? "the end of your billing period"}.
-              After that, your account will revert to the Free plan.
-              You can upgrade again at any time to keep Pro features.
-            </p>
-          </div>
-        ) : null}
-
-        {isCanceledAndExpired ? (
-          <div className="rounded-none border border-muted-foreground/20 bg-muted/30 p-3">
-            <p className="text-sm font-medium text-foreground">
-              Your Pro plan has expired
-            </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Your Pro subscription has ended. Upgrade again to restore
-              unlimited AI reviews and all Pro features.
-            </p>
-          </div>
-        ) : null}
-
         <p className="text-xs text-muted-foreground">{getUsageText(usage)}</p>
         <ul className="space-y-2 text-xs text-muted-foreground">
           {planDetails.features.map((feature) => (
@@ -276,8 +225,12 @@ function SubscriptionTab({
         </ul>
       </CardContent>
       <CardFooter className="flex flex-wrap gap-2">
-        {showUpgradeButton ? <UpgradeButton /> : null}
-        {showCancelButton ? <CancelSubscriptionButton /> : null}
+        {subscription.plan === "free" ? <UpgradeButton /> : null}
+        {subscription.plan === "pro" ? (
+          <CancelSubscriptionButton
+            disabled={subscription.status === "canceled"}
+          />
+        ) : null}
       </CardFooter>
     </Card>
   );
