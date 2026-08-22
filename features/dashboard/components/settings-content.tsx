@@ -166,6 +166,8 @@ function SubscriptionTab({
   const statusLabel = getSubscriptionStatusLabel(subscription.status);
 
   const isActive = subscription.status === "active";
+  const canCancel = subscription.plan === "pro" && subscription.status === "active";
+  const canUpgrade = subscription.plan === "free" || subscription.status === "canceled";
 
   // Visual styling reflects active vs inactive subscription
   let cardBorderClass = "border-border";
@@ -229,12 +231,8 @@ function SubscriptionTab({
         </ul>
       </CardContent>
       <CardFooter className="flex flex-wrap gap-2">
-        {subscription.plan === "free" ? <UpgradeButton /> : null}
-        {subscription.plan === "pro" ? (
-          <CancelSubscriptionButton
-            disabled={subscription.status === "canceled"}
-          />
-        ) : null}
+        {canUpgrade ? <UpgradeButton /> : null}
+        {canCancel ? <CancelSubscriptionButton /> : null}
       </CardFooter>
     </Card>
   );
