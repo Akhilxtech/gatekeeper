@@ -351,7 +351,7 @@ export function OverviewContent({ data }: OverviewContentProps) {
                 </span>
               </div>
             </CardContent>
-            {subscription.plan === "free" && (
+            {(subscription.plan === "free" || subscription.status === "canceled") && (
               <CardFooter>
                 <Link href={DASHBOARD_ROUTES.settings} className="w-full">
                   <Button
@@ -359,7 +359,9 @@ export function OverviewContent({ data }: OverviewContentProps) {
                     size="sm"
                   >
                     <Zap className="mr-1.5 size-3.5" />
-                    Upgrade to Pro
+                    {subscription.status === "canceled"
+                      ? "Upgrade to Pro Again"
+                      : "Upgrade to Pro"}
                   </Button>
                 </Link>
               </CardFooter>
