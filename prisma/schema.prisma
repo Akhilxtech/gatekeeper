@@ -19,7 +19,7 @@ model User {
   emailVerified          Boolean             @default(false)
   plan                   String              @default("free")
   razorpaySubscriptionId String?
-  subscriptionStatus     String? // active | cancelled |trialing 
+  subscriptionStatus     String? // pending | active | canceled
   subscriptionRenewsAt   DateTime?
   image                  String?
   createdAt              DateTime            @default(now())

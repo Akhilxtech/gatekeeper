@@ -58,7 +58,7 @@ function formatRenewalDate(renewsAt: string | null): string | null {
 /**
  * Maps subscription status enum to a lowercase label for the UI.
  *
- * @param status - `active`, `trialing`, or `canceled`.
+ * @param status - `active`, `pending`, or `canceled`.
  * @returns Display string for the status line.
  */
 function getSubscriptionStatusLabel(status: UserSubscription["status"]): string {
@@ -66,8 +66,8 @@ function getSubscriptionStatusLabel(status: UserSubscription["status"]): string 
     return "active";
   }
 
-  if (status === "trialing") {
-    return "trialing";
+  if (status === "pending") {
+    return "activation pending";
   }
 
   return "canceled";
@@ -165,7 +165,7 @@ function SubscriptionTab({
   const renewalDate = formatRenewalDate(subscription.renewsAt);
   const statusLabel = getSubscriptionStatusLabel(subscription.status);
 
-  const isActive = subscription.status === "active" || subscription.status === "trialing";
+  const isActive = subscription.status === "active";
 
   // Visual styling reflects active vs inactive subscription
   let cardBorderClass = "border-border";
@@ -181,6 +181,10 @@ function SubscriptionTab({
   }
 
   if (subscription.status === "canceled") {
+    badgeTone = "warning";
+  }
+
+  if (subscription.status === "pending") {
     badgeTone = "warning";
   }
 

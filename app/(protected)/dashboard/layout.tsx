@@ -13,7 +13,11 @@ export default async function DashboardLayout({
   const subscription = await getUserSubscription(session.user.id);
 
   return (
-    <DashboardShell user={session.user} plan={subscription.plan}>
+    <DashboardShell
+      user={session.user}
+      plan={subscription.plan}
+      subscriptionStatus={subscription.status}
+    >
       {children}
     </DashboardShell>
   );

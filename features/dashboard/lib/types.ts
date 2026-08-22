@@ -39,6 +39,6 @@ export type SubscriptionPlan = "free" | "pro";
  */
 export type UserSubscription = {
   plan: SubscriptionPlan;
-  status: "active" | "canceled" | "trialing";
+  status: "active" | "canceled" | "pending";
   renewsAt: string | null;
 };
