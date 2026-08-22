@@ -1,10 +1,12 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
 import { prisma } from "@/lib/db";
+import {
+  updateUserSubscriptionFromRazorpay,
+  type RazorpaySubscriptionSnapshot,
+} from "@/features/billing/server/subscription";
 
-type RazorpaySubscriptionPayload = {
-  id: string;
-  current_end?: number;
+type RazorpaySubscriptionPayload = RazorpaySubscriptionSnapshot & {
   notes?: { userId?: string };
 };
 
@@ -18,6 +20,7 @@ type RazorpayWebhookBody = {
 };
 
 const HANDLED_EVENTS = new Set([
+  "subscription.authenticated",
   "subscription.activated",
   "subscription.charged",
   "subscription.cancelled",
@@ -74,53 +77,7 @@ export async function POST(request: Request) {
     return Response.json({ received: true });
   }
 
-  const renewsAt = subscription.current_end
-    ? new Date(subscription.current_end * 1000)
-    : null;
-
-  if (event.event === "subscription.activated") {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        plan: "pro",
-        razorpaySubscriptionId: subscription.id,
-        subscriptionStatus: "active",
-        subscriptionRenewsAt: renewsAt,
-      },
-    });
-  }
-
-  if (event.event === "subscription.charged") {
-    await prisma.user.update({
-      where: { id: userId },
-      data: { subscriptionRenewsAt: renewsAt },
-    });
-  }
-
-  if (event.event === "subscription.cancelled") {
-    await prisma.user.update({
-      where: { id: userId },
-      data: { subscriptionStatus: "canceled" },
-    });
-  }
-
-  if (event.event === "subscription.halted") {
-    await prisma.user.update({
-      where: { id: userId },
-      data: { subscriptionStatus: "halted" },
-    });
-  }
-
-  if (event.event === "subscription.completed") {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        plan: "free",
-        subscriptionStatus: "canceled",
-        subscriptionRenewsAt: null,
-      },
-    });
-  }
+  await updateUserSubscriptionFromRazorpay(userId, subscription);
 
   return Response.json({ received: true });
 }

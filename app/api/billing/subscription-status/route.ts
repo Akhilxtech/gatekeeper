@@ -1,5 +1,5 @@
 import { getServerSession } from "@/features/auth/actions";
-import { getUserSubscription } from "@/features/billing/server/subscription";
+import { syncUserSubscription } from "@/features/billing/server/subscription";
 
 /**
  * GET /api/billing/subscription-status
@@ -15,7 +15,7 @@ export async function GET() {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const subscription = await getUserSubscription(session.user.id);
+  const subscription = await syncUserSubscription(session.user.id);
 
   return Response.json(subscription);
 }
