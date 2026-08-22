@@ -35,7 +35,7 @@ export async function getUserSubscription(
       user.subscriptionRenewsAt !== null && user.subscriptionRenewsAt > new Date();
 
     if (stillActive) {
-      return { plan: "pro", status: "canceled", renewsAt };
+      return { plan: "pro", status: "active", renewsAt };
     }
 
     return { plan: "free", status: "canceled", renewsAt };
@@ -51,16 +51,11 @@ export async function getUserSubscription(
 export async function createProSubscription(userId: string) {
   const subscription = await getUserSubscription(userId);
 
-  // Only block if the user already has a fully active Pro subscription.
-  // Allow re-subscribing for canceled or expired plans.
-  if (
-    subscription.plan === "pro" &&
-    subscription.status === "active"
-  ) {
+  if (subscription.plan === "pro" && subscription.status === "active") {
     throw new Error("You already have an active Pro subscription.");
   }
 
-  const planId = process.env.RAZORPAY_PLANID;
+  const planId = process.env.RAZORPAY_PLAN_ID;
   if (!planId) {
     throw new Error("Razorpay plan is not configured.");
   }

@@ -32,4 +32,3 @@ export async function getUserSettings(userId: string): Promise<UserSettings> {
       usage,
     };
   }
-  
