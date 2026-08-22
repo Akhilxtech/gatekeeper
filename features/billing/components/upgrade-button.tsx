@@ -41,7 +41,14 @@ export function UpgradeButton() {
         setLoading(true);
     
         try {
-          const { subscriptionId } = await startProSubscription();
+          const result = await startProSubscription();
+
+          if ("error" in result) {
+            toast.error(result.error);
+            return;
+          }
+
+          const { subscriptionId } = result;
     
           const checkout = new window.Razorpay({
             key,
