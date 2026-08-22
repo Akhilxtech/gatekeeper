@@ -34,7 +34,7 @@ const signInPage = async ({searchParams}:signInPageProps) => {
            <div className="mb-6 flex justify-center pt-2">
              <Image
                src="/gatekeeper.png"
-               alt="Chai AI Code Reviewer"
+               alt="gatekeeper"
                width={172}
                height={172}
                priority

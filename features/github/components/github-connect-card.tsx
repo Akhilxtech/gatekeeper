@@ -155,7 +155,7 @@ export function GithubConnectCard({
                             <div>
                                 <CardTitle>GitHub App</CardTitle>
                                 <CardDescription>
-                                    Install the Chai reviewer app on your GitHub account or
+                                    Install the gatekeeper reviewer app on your GitHub account or
                                     organization to access public and private repositories.
                                 </CardDescription>
                             </div>
